@@ -1,4 +1,4 @@
-module github.com/idgmo/goServe.git
+module github.com/idgmo/goServe
 
 go 1.16
 

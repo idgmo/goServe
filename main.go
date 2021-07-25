@@ -1,41 +1,27 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/idgmo/goServe/tree/main/internal/db"
+	"github.com/idgmo/goServe/internal/app"
+	"github.com/idgmo/goServe/internal/db"
 )
 
-func setupRouter(router *mux.Router) {
-	router.
-		Methods("POST").
-		Path("/endpoint").
-		HandlerFunc(postFunction)
-}
-
-func postFunction(w http.ResponseWriter, r *http.Request) {
+func main() {
 	database, err := db.CreateDatabase()
 	if err != nil {
-		log.Fatal("Database connection failed")
+		log.Fatal("Database Connection failed: %s", err.Error())
 	}
 
-	_, err = database.Exec("INSERT INTO `test` (name) VALUES ('myname')")
-	if err != nil {
-		log.Fatal("Database INSERT failed")
+	app := &app.App{
+		Router:   mux.NewRouter().StrictSlash(true),
+		Database: database,
 	}
 
-	log.Println("Something has been called. (POST)")
-	fmt.Println("Something has been called. (POST)")
-}
+	app.SetupRouter()
 
-func main() {
-	router := mux.NewRouter().StrictSlash(true)
-
-	setupRouter(router)
-
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", app.Router))
 
 }
