@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/idgmo/goServe/internal/db"
+	"github.com/idgmo/goServe/tree/main/internal/db"
 )
 
 func setupRouter(router *mux.Router) {
