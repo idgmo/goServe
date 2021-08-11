@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	_ "github.com/lib/pq"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/mysql"
@@ -13,14 +15,15 @@ import (
 )
 
 func CreateDatabase() (*sql.DB, error) {
-	serverName := "localhost:3306"
+	// serverName := "localhost:3306"
 	user := "myuser"
-	password := "pw"
+	// password := "pw"
 	dbName := "demo"
+	connectionString := fmt.Sprintf("user=%s dbname=%s sslmode=disable", user, dbName)
 
-	connectionString := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&collation=utf8mb4_unicode_ci&parseTime=true&multiStatements=true", user, password, serverName, dbName)
+	db, err := sql.Open("postgres", connectionString)
+	defer db.Close()
 
-	db, err := sql.Open("mysql", connectionString)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +48,7 @@ func migrateDatabase(db *sql.DB) error {
 
 	migration, err := migrate.NewWithDatabaseInstance(
 		fmt.Sprintf("file://%s/internal/db/migrations", dir),
-		"mysql",
+		"postgres",
 		driver,
 	)
 	if err != nil {
